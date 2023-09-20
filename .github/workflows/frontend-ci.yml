@@ -17,7 +17,7 @@ defaults:
 # Jobs defined in the workflow
 jobs:
   running-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -28,7 +28,7 @@ jobs:
           node-version: latest
 
       - name: use correct node version
-        run: source ~/.bash_profile | nvm use
+        run: nvm use
 
       - name: install dependancy
         run: npm ci
@@ -38,7 +38,7 @@ jobs:
         
 
   running-linter:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -49,7 +49,7 @@ jobs:
           node-version: latest
 
       - name: use correct node version
-        run: source ~/.bash_profile | nvm use
+        run: nvm use
 
       - name: install dependancy
         run: npm ci
