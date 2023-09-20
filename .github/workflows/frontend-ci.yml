@@ -28,9 +28,6 @@ jobs:
           node-version: latest
           node-version-file: starter/frontend/.nvmrc
 
-      - name: use correct node version
-        run: nvm use
-
       - name: install dependancy
         run: npm ci
 
