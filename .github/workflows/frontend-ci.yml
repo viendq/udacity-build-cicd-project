@@ -28,7 +28,7 @@ jobs:
           node-version: latest
 
       - name: use correct node version
-        run: nvm use
+        run: source ~/.bash_profile | nvm use
 
       - name: install dependancy
         run: npm ci
@@ -49,7 +49,7 @@ jobs:
           node-version: latest
 
       - name: use correct node version
-        run: nvm use
+        run: source ~/.bash_profile | nvm use
 
       - name: install dependancy
         run: npm ci
