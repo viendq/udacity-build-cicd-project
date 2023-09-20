@@ -1,0 +1,58 @@
+# Workflow name
+name: Frondend CI
+
+# Triggers for the workflow
+on:
+  # Manual trigger using the workflow_dispatch event
+  workflow_dispatch:
+
+  # Automatic trigger on pull request events targeting the main branch
+  pull_request:
+    branches:
+      - main
+
+defaults:
+  run:
+    working-directory: starter/frontend
+# Jobs defined in the workflow
+jobs:
+  running-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js 
+        uses: actions/setup-node@v3
+        with:
+          node-version: latest
+
+      - name: use correct node version
+        run: nvm use
+
+      - name: install dependancy
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+        
+
+  running-linter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js 
+        uses: actions/setup-node@v3
+        with:
+          node-version: latest
+
+      - name: use correct node version
+        run: nvm use
+
+      - name: install dependancy
+        run: npm ci
+
+      - name: run linter
+        run: npm run lint
