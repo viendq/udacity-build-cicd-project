@@ -17,15 +17,15 @@ defaults:
 # Jobs defined in the workflow
 jobs:
   running-test:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Node.js 
-        uses: actions/setup-node@v3
+        uses: dcodeIO/setup-node-nvm@master
         with:
-          node-version: latest
+          node-version: lts/*
 
       - name: use correct node version
         run: nvm use
@@ -38,15 +38,15 @@ jobs:
         
 
   running-linter:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Node.js 
-        uses: actions/setup-node@v3
+        uses: dcodeIO/setup-node-nvm@master
         with:
-          node-version: latest
+          node-version: lts/*
 
       - name: use correct node version
         run: nvm use
