@@ -142,5 +142,6 @@ jobs:
           echo "ARN: $ARN"
           aws eks update-kubeconfig --region us-east-1 --name cluster
           echo "Start Deploy"
-          kubectl apply -f k8s
+          cd k8s
+          ./kustomize -build | kubectl apply -f -
           echo "Deploy Done"
