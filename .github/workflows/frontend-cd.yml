@@ -124,7 +124,9 @@ jobs:
       - name: Deploy Kubernetes manifests                                                                            
         uses: imranismail/setup-kustomize@v2
       - run: |
-          cd k8s/
-          aws eks update-kubeconfig
+          cd k8s
           kustomize edit set image frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          kustomize build | kubectl apply -f -
+          git add .
+          git commit -m "Set `frontend` image tag to `$IMAGE_TAG`"
+          git push
+
