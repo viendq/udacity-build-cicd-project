@@ -132,7 +132,7 @@ jobs:
       - name: Install kubectl  
         uses: nikosch86/github-action-eks-kubectl@main
         with: 
-          command: "apply -f k8s"
+          command: "apply -f ./starter/frontend/k8s"
         env:
           EKS_CLUSTER: "cluster"
       # - name: Deploy k8s
