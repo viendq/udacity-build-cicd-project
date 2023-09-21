@@ -129,18 +129,15 @@ jobs:
         env:
           ARN: ${{ secrets.GH_ACTION_ARN }}
         run: |
-          set -e -o pipefail
-          echo "Downloading tool..."
-          curl -X GET -L https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.6.2/aws-iam-authenticator_0.6.2_linux_amd64 -o aws-iam-authenticator
-          chmod +x aws-iam-authenticator
-          echo "Updating permissions"
-          ./aws-iam-authenticator add user --userarn=$ARN --username=github-action-role --groups=system:masters --kubeconfig=~/.kube/config --prompt=false
-          echo "Cleaning up"
-          rm aws-iam-authenticator
-          echo "Done!"
-          aws eks --region us-east-1 update-kubeconfig --name cluster
-          pwd
           cd k8s
           curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
           ./kustomize edit set image frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          ./kustomize build | kubectl apply -f -
+          ./kustomize build
+      
+      - name: Run kubectl  
+        uses: nikosch86/github-action-eks-kubectl@main
+        with:
+          command: "apply -f k8s/*"
+        env:
+          EKS_CLUSTER: "cluster"
+
