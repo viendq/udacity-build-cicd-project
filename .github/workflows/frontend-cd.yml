@@ -129,6 +129,7 @@ jobs:
           cd k8s
           curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
           ./kustomize edit set image frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          ./kustomize build | kubectl apply -f -
           
           
 
