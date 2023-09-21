@@ -123,11 +123,6 @@ jobs:
         # echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
       
       - name: Deploy Kubernetes manifests
-        uses: actions-hub/kubectl@master
-      
-      - name: Deploy
-        env:
-          ARN: ${{ secrets.GH_ACTION_ARN }}
         run: |
           cd k8s
           curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
