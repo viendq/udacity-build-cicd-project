@@ -143,5 +143,5 @@ jobs:
           aws eks update-kubeconfig --region us-east-1 --name cluster
           echo "Start Deploy"
           cd k8s
-          ./kustomize -build | kubectl apply -f -
+          ./kustomize build | kubectl apply -f -
           echo "Deploy Done"
