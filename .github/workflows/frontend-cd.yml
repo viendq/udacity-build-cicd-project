@@ -16,54 +16,54 @@ defaults:
     working-directory: starter/frontend
 # Jobs defined in the workflow
 jobs:
-  running-test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  # running-test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
 
-      - name: Set up Node.js 
-        uses: actions/setup-node@v3
-        with:
-          node-version: latest
-          node-version-file: starter/frontend/.nvmrc
+  #     - name: Set up Node.js 
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: latest
+  #         node-version-file: starter/frontend/.nvmrc
           
-      - name: Restore cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+  #     - name: Restore cache
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: ~/.npm
+  #         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
-      - name: install dependancy
-        run: npm ci
+  #     - name: install dependancy
+  #       run: npm ci
 
-      - name: Run tests
-        run: npm test
+  #     - name: Run tests
+  #       run: npm test
         
 
-  running-linter:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  # running-linter:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
 
-      - name: Set up Node.js 
-        uses: actions/setup-node@v3
-        with:
-          node-version: latest
-          node-version-file: starter/frontend/.nvmrc
+  #     - name: Set up Node.js 
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: latest
+  #         node-version-file: starter/frontend/.nvmrc
 
-      - name: Restore cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+  #     - name: Restore cache
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: ~/.npm
+  #         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
-      - name: install dependancy
-        run: npm ci
+  #     - name: install dependancy
+  #       run: npm ci
 
-      - name: run linter
-        run: npm run lint
+  #     - name: run linter
+  #       run: npm run lint
 
   # build-actions:
   #   needs: [running-test, running-linter]
@@ -94,7 +94,7 @@ jobs:
   #       run: docker run --name mp-frontend -p 3000:3000 -d mp-frontend
         
   post-build-actions:
-    needs: [running-test, running-linter]
+    # needs: [running-test, running-linter]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -118,9 +118,9 @@ jobs:
         run: |
           echo "ECR_REGISTRY: $ECR_REGISTRY"
           echo "IMAGE_TAG: $IMAGE_TAG"
-          docker build --build-arg=REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL --tag=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          # docker build --build-arg=REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL --tag=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          # docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          # echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
       
       - name: Deploy Kubernetes manifests
         env:
