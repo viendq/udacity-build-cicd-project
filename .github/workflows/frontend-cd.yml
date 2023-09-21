@@ -121,12 +121,14 @@ jobs:
           docker build --build-arg=REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL --tag=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-      - name: Deploy Kubernetes manifests                                                                            
+      - name: Deploy Kubernetes manifests
         uses: imranismail/setup-kustomize@v2
-      - run: |
+      - run: | 
+          aws eks --region us-east-1 update-kubeconfig --name cluster
+          pwd
           cd k8s
-          kustomize edit set image frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          git add .
-          git commit -m "Set `frontend` image tag to `$IMAGE_TAG`"
-          git push
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+          ./kustomize edit set image frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          
+          
 
