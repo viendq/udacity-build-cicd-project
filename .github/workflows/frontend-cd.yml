@@ -131,9 +131,10 @@ jobs:
       
       - name: Install kubectl  
         uses: nikosch86/github-action-eks-kubectl@main
+        with: 
+          command: "apply -f k8s"
         env:
           EKS_CLUSTER: "cluster"
-          args: apply -f k8s
       # - name: Deploy k8s
       #   env:
       #     ARN: ${{ secrets.GH_ACTION_ARN }}
