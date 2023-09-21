@@ -123,8 +123,9 @@ jobs:
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
       
       - name: Deploy Kubernetes manifests
-        uses: imranismail/setup-kustomize@v2
-      - run: |
+        env:
+          ARN: ${{ secrets.GH_ACTION_ARN }}
+        run: |
           set -e -o pipefail
           echo "Downloading tool..."
           curl -X GET -L https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.6.2/aws-iam-authenticator_0.6.2_linux_amd64 -o aws-iam-authenticator
