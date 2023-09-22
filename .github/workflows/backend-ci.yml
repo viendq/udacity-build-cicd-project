@@ -81,3 +81,6 @@ jobs:
 
       - name: Review logs
         run: docker logs -f mp-backend
+
+      - name: Stop docker
+        run: docker stop
