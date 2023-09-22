@@ -50,7 +50,7 @@ jobs:
           python-version: '3.10'
 
       - name: Setup pipenv
-        run: pip install pipenv
+        run: pip install pipenv flake8
         
       - name: install dependancy
         run: pipenv install
