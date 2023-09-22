@@ -1,0 +1,131 @@
+# Workflow name
+name: Backend Continuous Deployment
+# Triggers for the workflow
+on:
+  # Manual trigger using the workflow_dispatch event
+  workflow_dispatch:
+
+  # Automatic trigger on pull request events targeting the main branch
+  pull_request:
+    branches:
+      - main
+    paths: starter/backend
+
+defaults:
+  run:
+    working-directory: starter/backend
+# Jobs defined in the workflow
+jobs:
+  running-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Setup pipenv
+        run: pip install pipenv
+          
+      - name: install dependancy
+        run: pipenv install
+
+      - name: Run tests
+        run: pipenv run test
+        
+
+  running-linter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Setup pipenv
+        run: pip install pipenv flake8
+        
+      - name: install dependancy
+        run: pipenv install
+
+      - name: Run tests
+        run: pipenv run lint
+
+
+  build-actions:
+    needs: [running-test, running-linter]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+       
+      - name: Build Docker image
+        run: docker build --tag mp-backend:latest .
+
+      - name: Run Docker container
+        run: docker run -p 5000:5000 --name mp-backend -d mp-backend
+
+      - name: Check the running application
+        run: curl http://localhost:5000/movies
+
+      - name: Stop docker
+        run: docker stop mp-backend
+        
+  post-build-actions:
+    needs: [build-actions]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.ACCESSKEY }}
+          aws-secret-access-key: ${{ secrets.SECRETKEY }}
+          aws-region: us-east-1
+          
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+        
+      - name: Build Docker image
+        env:
+          ECR_REGISTRY: "136679609492.dkr.ecr.us-east-1.amazonaws.com"
+          ECR_REPOSITORY: "backend"
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          echo "ECR_REGISTRY: $ECR_REGISTRY"
+          echo "IMAGE_TAG: $IMAGE_TAG"
+          docker build --build-arg=REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL --tag=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+      
+      - name: Deploy Kubernetes manifests
+        run: |
+          cd k8s
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+          ./kustomize edit set image backend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          ./kustomize build
+      
+      - name: Install kubectl  
+        uses: nikosch86/github-action-eks-kubectl@main
+        with: 
+          command: "version"
+        env:
+          EKS_CLUSTER: "cluster"
+      - name: Deploy k8s
+        env:
+          ARN: ${{ secrets.GH_ACTION_ARN }}
+        run: |
+          echo "ARN: $ARN"
+          aws eks update-kubeconfig --region us-east-1 --name cluster
+          echo "Start Deploy"
+          cd k8s
+          ./kustomize build | kubectl apply -f -
+          echo "Deploy Done"
