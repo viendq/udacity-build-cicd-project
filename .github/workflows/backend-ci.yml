@@ -64,21 +64,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Setup pipenv
-        run: pip install pipenv
-        
-      - name: install dependancy
-        run: pipenv install
-
-      - name: run application
-        run: pipenv run serve
-        
+       
       - name: Build Docker image
         run: docker build --tag mp-backend:latest .
 
