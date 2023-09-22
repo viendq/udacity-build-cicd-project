@@ -1,0 +1,83 @@
+# Workflow name
+name: Backend Continuous Integration
+
+# Triggers for the workflow
+on:
+  # Manual trigger using the workflow_dispatch event
+  workflow_dispatch:
+
+  # Automatic trigger on pull request events targeting the main branch
+  pull_request:
+    branches:
+      - main
+    paths: starter/backend
+
+defaults:
+  run:
+    working-directory: starter/backend
+# Jobs defined in the workflow
+jobs:
+  running-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+          
+      - name: install dependancy
+        run: pipenv install
+
+      - name: Run tests
+        run: pipenv run test
+        
+
+  running-linter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+          
+      - name: install dependancy
+        run: pipenv install
+
+      - name: Run tests
+        run: pipenv run lint
+
+  post-build-actions:
+    needs: [running-test, running-linter]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+          
+      - name: install dependancy
+        run: pipenv install
+
+      - name: run application
+        run: pipenv run serve
+        
+      - name: Build Docker image
+        run: docker build --tag mp-backend:latest .
+
+      - name: Run Docker container
+        run: docker run -p 5000:5000 --name mp-backend -d mp-backend
+
+      - name: Check the running application
+        run: curl http://localhost:5000/movies
+
+      - name: Review logs
+        run: docker logs -f mp-backend
